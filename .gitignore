@@ -1,0 +1,59 @@
+# System files
+$RECYCLE.BIN/
+System Volume Information/
+Thumbs.db
+Desktop.ini
+*.tmp
+
+# Cache and temporary directories
+Temp/
+QQMusicCache/
+qycache/
+BaiduNetdiskDownload/
+ApkMagicEmu/
+MobileEmuMaster/
+
+# Software installation paths
+Program Files (x86)/
+program files/
+ProgramData/
+WPS安装路径/
+搜狗安装路径/
+腾旭视频/
+Youku Files/
+
+# 360 Security files
+360CloudEnterprise/
+2345AvScan/
+$360Section/
+qqpcmgr_docpro/
+
+# WeChat and QQ files
+Weixin/
+xwechat_files/
+qqyingyue/
+
+# Random hash directories
+04528f292bb7ccac0e28dfc78066ad68/
+
+# Video files
+*.mp4
+
+# PDF files that might be sensitive
+*.pdf
+
+# Compressed files directory
+好压/
+
+# Executable files
+*.exe
+
+# WdGame directory
+WdGame/
+
+# Standard Windows directories
+Documents/
+Downloads/
+Pictures/
+Favorites/
+Git/
