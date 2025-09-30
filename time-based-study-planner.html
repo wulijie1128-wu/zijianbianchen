@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 智能时间表学习计划</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .current-time {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            min-width: 120px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .task-input-section {
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px dashed #4facfe;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .input-field {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .input-field label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .input-field input,
+        .input-field select,
+        .input-field textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-field input:focus,
+        .input-field select:focus,
+        .input-field textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.2);
+        }
+
+        .time-inputs {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .time-inputs input[type="time"] {
+            flex: 1;
+        }
+
+        .add-task-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.3s;
+            width: 100%;
+        }
+
+        .add-task-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .schedule-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .schedule-header h3 {
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .voice-toggle {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .voice-toggle:hover {
+            background: #218838;
+            transform: scale(1.05);
+        }
+
+        .voice-toggle.disabled {
+            background: #6c757d;
+        }
+
+        .timeline {
+            position: relative;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 15px 0;
+            border-left: 3px solid #e0e0e0;
+            margin-left: 50px;
+            padding-left: 30px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e0e0e0;
+        }
+
+        .timeline-item.active {
+            border-left-color: #4facfe;
+        }
+
+        .timeline-item.active::before {
+            background: #4facfe;
+            animation: pulse 2s infinite;
+        }
+
+        .timeline-item.completed {
+            border-left-color: #28a745;
+        }
+
+        .timeline-item.completed::before {
+            background: #28a745;
+        }
+
+        .timeline-item.overdue {
+            border-left-color: #dc3545;
+        }
+
+        .timeline-item.overdue::before {
+            background: #dc3545;
+            animation: warning-pulse 1s infinite;
+        }
+
+        .timeline-time {
+            position: absolute;
+            left: -45px;
+            top: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #666;
+            width: 35px;
+            text-align: right;
+        }
+
+        .timeline-content {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+        }
+
+        .timeline-content:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .timeline-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .timeline-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            color: #666;
+            flex-wrap: wrap;
+        }
+
+        .timeline-description {
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .timeline-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .btn-complete {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-complete:hover {
+            background: #218838;
+            transform: scale(1.05);
+        }
+
+        .btn-upload {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-upload:hover {
+            background: #138496;
+            transform: scale(1.05);
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+            transform: scale(1.05);
+        }
+
+        .screenshot-upload {
+            margin-top: 10px;
+            display: none;
+        }
+
+        .screenshot-upload input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            border: 2px dashed #4facfe;
+            border-radius: 5px;
+            background: #f8f9ff;
+        }
+
+        .screenshot-preview {
+            margin-top: 10px;
+            max-width: 200px;
+            max-height: 150px;
+            border-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease-in-out;
+            max-width: 350px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+
+        .notification.warning {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #dc3545, #e83e8c);
+        }
+
+        .floating-reminder {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ff6b6b, #ffa500);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 50px;
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+            cursor: pointer;
+            animation: urgent-pulse 1.5s infinite;
+            display: none;
+            z-index: 1001;
+        }
+
+        .priority-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .priority-tag.high {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .priority-tag.medium {
+            background: #fff8e1;
+            color: #f57c00;
+        }
+
+        .priority-tag.low {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-badge.active {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-badge.completed {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .status-badge.overdue {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes warning-pulse {
+            0% { background: #dc3545; }
+            50% { background: #ff6b6b; }
+            100% { background: #dc3545; }
+        }
+
+        @keyframes urgent-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+
+            .container {
+                margin: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .timeline-item {
+                margin-left: 30px;
+                padding-left: 20px;
+            }
+
+            .timeline-time {
+                left: -30px;
+                font-size: 0.8rem;
+                width: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>📚 智能时间表学习计划</h1>
+            <div class="current-time" id="currentTime">00:00:00</div>
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-number" id="totalTasks">0</span>
+                    <span class="stat-label">今日任务</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="completedTasks">0</span>
+                    <span class="stat-label">已完成</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="completionRate">0%</span>
+                    <span class="stat-label">完成率</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="overdueCount">0</span>
+                    <span class="stat-label">超时任务</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="left-panel">
+                <section class="task-input-section">
+                    <h2>📝 添加学习任务</h2>
+                    <form id="taskForm">
+                        <div class="input-group">
+                            <div class="input-field">
+                                <label for="taskTitle">📖 任务标题</label>
+                                <input type="text" id="taskTitle" placeholder="例如：复习数学第三章" required>
+                            </div>
+                            <div class="input-field">
+                                <label for="taskPriority">⭐ 优先级</label>
+                                <select id="taskPriority">
+                                    <option value="low">低优先级 🟢</option>
+                                    <option value="medium">中优先级 🟡</option>
+                                    <option value="high">高优先级 🔴</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <div class="input-field">
+                                <label for="taskStartTime">⏰ 开始时间</label>
+                                <input type="time" id="taskStartTime" required>
+                            </div>
+                            <div class="input-field">
+                                <label for="taskEndTime">⏰ 结束时间</label>
+                                <input type="time" id="taskEndTime" required>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <div class="input-field">
+                                <label for="taskDescription">📝 任务描述</label>
+                                <textarea id="taskDescription" placeholder="详细描述你要完成的学习内容..." rows="3"></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="add-task-btn">✨ 添加到时间表</button>
+                    </form>
+                </section>
+            </div>
+
+            <div class="right-panel">
+                <section class="schedule-section">
+                    <div class="schedule-header">
+                        <h3>📅 今日时间表</h3>
+                        <button id="voiceToggle" class="voice-toggle">🔊 语音提醒已开启</button>
+                    </div>
+                    <div class="timeline" id="timeline">
+                        <div class="empty-state" id="emptyState">
+                            <div style="font-size: 4rem;">⏰</div>
+                            <h3>还没有安排学习时间</h3>
+                            <p>添加第一个学习任务，开始规划你的一天！</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div id="notification" class="notification"></div>
+    <div id="floatingReminder" class="floating-reminder">
+        🚨 有任务超时了！点击查看
+    </div>
+
+    <script>
+        class TimeBasedStudyPlanner {
+            constructor() {
+                this.tasks = JSON.parse(localStorage.getItem('timeBasedTasks')) || [];
+                this.voiceEnabled = JSON.parse(localStorage.getItem('voiceEnabled')) !== false;
+                this.speechSynthesis = window.speechSynthesis;
+                this.reminderInterval = null;
+                this.currentTaskTimer = null;
+
+                this.encouragingMessages = [
+                    "太棒了！你按时完成了任务！🌟",
+                    "你真是太守时了！继续保持！💪",
+                    "完美！时间管理大师就是你！✨",
+                    "哇！你的自律能力真强！🎉",
+                    "了不起！准时完成任务的感觉真好！🚀",
+                    "太赞了！你的时间规划很棒！🏆",
+                    "超级棒！又一个任务按时搞定！⭐",
+                    "厉害了！你的执行力真强！📚",
+                    "完成得漂亮！时间掌控者就是你！🎊",
+                    "真不错！每分每秒都很珍贵！💎"
+                ];
+
+                this.voiceReminders = [
+                    "提醒！你的学习时间到了，请开始执行任务。",
+                    "注意！现在是学习时间，请专注完成你的任务。",
+                    "警告！任务时间已经开始，请立即投入学习。",
+                    "超时提醒！你的任务已经超过预定时间，请抓紧完成。",
+                    "紧急提醒！任务严重超时，请立即处理。"
+                ];
+
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.renderTimeline();
+                this.updateStats();
+                this.updateCurrentTime();
+                this.startReminderSystem();
+                this.setDefaultTimes();
+
+                // 每秒更新时间和检查任务状态
+                setInterval(() => {
+                    this.updateCurrentTime();
+                    this.checkTaskStatus();
+                }, 1000);
+            }
+
+            setupEventListeners() {
+                document.getElementById('taskForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.addTask();
+                });
+
+                document.getElementById('voiceToggle').addEventListener('click', () => {
+                    this.toggleVoice();
+                });
+
+                document.getElementById('floatingReminder').addEventListener('click', () => {
+                    this.showOverdueTasks();
+                });
+            }
+
+            setDefaultTimes() {
+                const now = new Date();
+                const startTime = new Date(now.getTime() + 5 * 60000); // 5分钟后
+                const endTime = new Date(now.getTime() + 65 * 60000); // 1小时5分钟后
+
+                document.getElementById('taskStartTime').value = this.formatTimeForInput(startTime);
+                document.getElementById('taskEndTime').value = this.formatTimeForInput(endTime);
+            }
+
+            formatTimeForInput(date) {
+                return date.toTimeString().slice(0, 5);
+            }
+
+            updateCurrentTime() {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('zh-CN', {
+                    hour12: false,
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                document.getElementById('currentTime').textContent = timeString;
+            }
+
+            addTask() {
+                const title = document.getElementById('taskTitle').value;
+                const priority = document.getElementById('taskPriority').value;
+                const startTime = document.getElementById('taskStartTime').value;
+                const endTime = document.getElementById('taskEndTime').value;
+                const description = document.getElementById('taskDescription').value;
+
+                // 验证时间
+                if (startTime >= endTime) {
+                    this.showNotification('⚠️ 结束时间必须晚于开始时间！', 'warning');
+                    return;
+                }
+
+                const task = {
+                    id: Date.now(),
+                    title,
+                    priority,
+                    startTime,
+                    endTime,
+                    description,
+                    completed: false,
+                    screenshot: null,
+                    createdAt: new Date(),
+                    completedAt: null
+                };
+
+                this.tasks.push(task);
+                this.saveTasks();
+                this.renderTimeline();
+                this.updateStats();
+                this.resetForm();
+                this.showNotification('✨ 任务已添加到时间表！', 'success');
+            }
+
+            completeTask(taskId) {
+                const task = this.tasks.find(t => t.id === taskId);
+                if (task && !task.completed) {
+                    // 需要截图才能完成
+                    if (!task.screenshot) {
+                        this.showNotification('📷 请先上传完成截图才能标记为完成！', 'warning');
+                        this.showUploadArea(taskId);
+                        return;
+                    }
+
+                    task.completed = true;
+                    task.completedAt = new Date();
+
+                    this.saveTasks();
+                    this.renderTimeline();
+                    this.updateStats();
+                    this.showEncouragement();
+                    this.playVoiceMessage(`恭喜完成任务：${task.title}`);
+                }
+            }
+
+            deleteTask(taskId) {
+                this.tasks = this.tasks.filter(t => t.id !== taskId);
+                this.saveTasks();
+                this.renderTimeline();
+                this.updateStats();
+                this.showNotification('🗑️ 任务已删除', 'error');
+            }
+
+            showUploadArea(taskId) {
+                const uploadArea = document.getElementById(`upload-${taskId}`);
+                if (uploadArea) {
+                    uploadArea.style.display = uploadArea.style.display === 'none' ? 'block' : 'none';
+                }
+            }
+
+            handleScreenshotUpload(taskId, event) {
+                const file = event.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const task = this.tasks.find(t => t.id === taskId);
+                        if (task) {
+                            task.screenshot = e.target.result;
+                            this.saveTasks();
+                            this.renderTimeline();
+                            this.showNotification('📷 截图上传成功！现在可以完成任务了', 'success');
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    this.showNotification('⚠️ 请上传有效的图片文件', 'warning');
+                }
+            }
+
+            checkTaskStatus() {
+                const now = new Date();
+                const currentTime = now.getHours() * 60 + now.getMinutes();
+
+                this.tasks.forEach(task => {
+                    if (task.completed) return;
+
+                    const [startHour, startMinute] = task.startTime.split(':').map(Number);
+                    const [endHour, endMinute] = task.endTime.split(':').map(Number);
+                    const taskStartTime = startHour * 60 + startMinute;
+                    const taskEndTime = endHour * 60 + endMinute;
+
+                    const wasActive = task.status === 'active';
+                    const wasOverdue = task.status === 'overdue';
+
+                    if (currentTime >= taskStartTime && currentTime <= taskEndTime) {
+                        task.status = 'active';
+                        if (!wasActive) {
+                            this.playVoiceReminder(`现在是学习时间：${task.title}，请开始执行任务。`);
+                        }
+                    } else if (currentTime > taskEndTime) {
+                        task.status = 'overdue';
+                        if (!wasOverdue) {
+                            this.playVoiceReminder(`任务超时提醒：${task.title} 已超过预定时间，请立即完成。`);
+                        }
+                    } else {
+                        task.status = 'pending';
+                    }
+                });
+
+                this.saveTasks();
+                this.renderTimeline();
+                this.updateStats();
+            }
+
+            playVoiceReminder(message) {
+                if (!this.voiceEnabled) return;
+
+                if (this.speechSynthesis.speaking) {
+                    this.speechSynthesis.cancel();
+                }
+
+                const utterance = new SpeechSynthesisUtterance(message);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+                utterance.volume = 0.8;
+
+                this.speechSynthesis.speak(utterance);
+            }
+
+            playVoiceMessage(message) {
+                if (this.voiceEnabled) {
+                    this.playVoiceReminder(message);
+                }
+            }
+
+            toggleVoice() {
+                this.voiceEnabled = !this.voiceEnabled;
+                localStorage.setItem('voiceEnabled', JSON.stringify(this.voiceEnabled));
+
+                const button = document.getElementById('voiceToggle');
+                if (this.voiceEnabled) {
+                    button.textContent = '🔊 语音提醒已开启';
+                    button.classList.remove('disabled');
+                    this.showNotification('🔊 语音提醒已开启', 'success');
+                } else {
+                    button.textContent = '🔇 语音提醒已关闭';
+                    button.classList.add('disabled');
+                    this.showNotification('🔇 语音提醒已关闭', 'warning');
+                }
+            }
+
+            startReminderSystem() {
+                // 每分钟检查一次提醒
+                this.reminderInterval = setInterval(() => {
+                    this.checkReminders();
+                }, 60000);
+            }
+
+            checkReminders() {
+                const overdueTasks = this.tasks.filter(task =>
+                    !task.completed && task.status === 'overdue'
+                );
+
+                const floatingReminder = document.getElementById('floatingReminder');
+
+                if (overdueTasks.length > 0) {
+                    floatingReminder.textContent = `🚨 ${overdueTasks.length} 个任务超时了！`;
+                    floatingReminder.style.display = 'block';
+                } else {
+                    floatingReminder.style.display = 'none';
+                }
+            }
+
+            showOverdueTasks() {
+                const overdueTasks = this.tasks.filter(task =>
+                    !task.completed && task.status === 'overdue'
+                );
+
+                if (overdueTasks.length > 0) {
+                    const taskList = overdueTasks.map(task =>
+                        `• ${task.title} (${task.startTime}-${task.endTime})`
+                    ).join('\\n');
+                    this.showNotification(`超时任务：\\n${taskList}`, 'warning');
+                }
+            }
+
+            renderTimeline() {
+                const timeline = document.getElementById('timeline');
+                const emptyState = document.getElementById('emptyState');
+
+                if (this.tasks.length === 0) {
+                    timeline.innerHTML = '';
+                    timeline.appendChild(emptyState);
+                    return;
+                }
+
+                // 按开始时间排序
+                const sortedTasks = [...this.tasks].sort((a, b) => {
+                    return a.startTime.localeCompare(b.startTime);
+                });
+
+                timeline.innerHTML = sortedTasks.map(task => this.createTimelineItem(task)).join('');
+            }
+
+            createTimelineItem(task) {
+                const statusClass = task.completed ? 'completed' : (task.status || 'pending');
+                const statusBadge = task.completed ?
+                    '<span class="status-badge completed">✅ 已完成</span>' :
+                    task.status === 'active' ?
+                    '<span class="status-badge active">🔄 进行中</span>' :
+                    task.status === 'overdue' ?
+                    '<span class="status-badge overdue">⚠️ 已超时</span>' :
+                    '<span class="status-badge">⏳ 待开始</span>';
+
+                const screenshotPreview = task.screenshot ?
+                    `<img src="${task.screenshot}" class="screenshot-preview" alt="任务完成截图">` : '';
+
+                return `
+                    <div class="timeline-item ${statusClass}">
+                        <div class="timeline-time">${task.startTime}</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">${task.title}</div>
+                            <div class="timeline-meta">
+                                <span>⏰ ${task.startTime} - ${task.endTime}</span>
+                                <span class="priority-tag ${task.priority}">
+                                    ${task.priority === 'high' ? '🔴 高' : task.priority === 'medium' ? '🟡 中' : '🟢 低'}
+                                </span>
+                                ${statusBadge}
+                            </div>
+                            ${task.description ? `<div class="timeline-description">${task.description}</div>` : ''}
+                            ${screenshotPreview}
+                            <div class="timeline-actions">
+                                ${!task.completed ? `<button class="btn btn-complete" onclick="planner.completeTask(${task.id})">✅ 完成任务</button>` : ''}
+                                ${!task.completed ? `<button class="btn btn-upload" onclick="planner.showUploadArea(${task.id})">📷 上传截图</button>` : ''}
+                                <button class="btn btn-delete" onclick="planner.deleteTask(${task.id})">🗑️ 删除</button>
+                            </div>
+                            <div id="upload-${task.id}" class="screenshot-upload" style="display: none;">
+                                <input type="file" accept="image/*" onchange="planner.handleScreenshotUpload(${task.id}, event)" placeholder="选择完成截图...">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            updateStats() {
+                const total = this.tasks.length;
+                const completed = this.tasks.filter(t => t.completed).length;
+                const overdue = this.tasks.filter(t => t.status === 'overdue' && !t.completed).length;
+                const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+                document.getElementById('totalTasks').textContent = total;
+                document.getElementById('completedTasks').textContent = completed;
+                document.getElementById('completionRate').textContent = rate + '%';
+                document.getElementById('overdueCount').textContent = overdue;
+            }
+
+            showEncouragement() {
+                const message = this.encouragingMessages[Math.floor(Math.random() * this.encouragingMessages.length)];
+                this.showNotification(message, 'success');
+            }
+
+            showNotification(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = `notification ${type}`;
+                notification.classList.add('show');
+
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 4000);
+            }
+
+            resetForm() {
+                document.getElementById('taskForm').reset();
+                this.setDefaultTimes();
+            }
+
+            saveTasks() {
+                localStorage.setItem('timeBasedTasks', JSON.stringify(this.tasks));
+            }
+        }
+
+        // 启动时间表学习计划管理器
+        const planner = new TimeBasedStudyPlanner();
+    </script>
+</body>
+</html>

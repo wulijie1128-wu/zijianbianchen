@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>莉洁 - 个人介绍</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ffa726);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 35px;
+        }
+
+        .section h2 {
+            color: #333;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #ff6b6b;
+            display: inline-block;
+        }
+
+        .location {
+            background: #f8f9ff;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            font-size: 1.1em;
+        }
+
+        .achievements {
+            display: grid;
+            gap: 15px;
+        }
+
+        .achievement-item {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-left: 4px solid #ffa726;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .achievement-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .communities {
+            display: grid;
+            gap: 15px;
+        }
+
+        .community-item {
+            background: #f8f9ff;
+            padding: 18px;
+            border-radius: 12px;
+            border: 2px solid #e3f2fd;
+            transition: all 0.3s ease;
+        }
+
+        .community-item:hover {
+            border-color: #667eea;
+            background: #f0f7ff;
+        }
+
+        .community-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .community-price {
+            color: #ff6b6b;
+            font-size: 0.9em;
+        }
+
+        .discount-note {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #ffa726;
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+            color: #f57c00;
+        }
+
+        .services {
+            display: grid;
+            gap: 15px;
+        }
+
+        .service-item {
+            background: #f1f8e9;
+            padding: 18px;
+            border-radius: 12px;
+            border-left: 4px solid #66bb6a;
+        }
+
+        .footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 1.1em;
+        }
+
+        .highlight {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>你好，我是莉洁</h1>
+            <p class="subtitle">9岁女孩的妈妈 | 多元化发展 | AI探索者</p>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2><span class="emoji">📍</span>地区</h2>
+                <div class="location">
+                    湖北武汉
+                </div>
+            </div>
+
+            <div class="section">
+                <h2><span class="emoji">🏆</span>个人成就</h2>
+                <div class="achievements">
+                    <div class="achievement-item">
+                        <strong>房地产销售年度业绩突破10W+</strong>
+                    </div>
+                    <div class="achievement-item">
+                        <strong>产后科学瘦身40斤</strong> (130→90斤)
+                    </div>
+                    <div class="achievement-item">
+                        <strong>儿童面部彩绘副业月入6000+</strong>
+                    </div>
+                    <div class="achievement-item">
+                        <strong>精品微商运营月收益3000+</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2><span class="emoji">🌟</span>优质圈层资源</h2>
+                <div class="communities">
+                    <div class="community-item">
+                        <div class="community-name">1. 破局行动家高阶社群</div>
+                        <div class="community-price">（原价¥18000）</div>
+                    </div>
+                    <div class="community-item">
+                        <div class="community-name">2. 彩卉企业家内部群</div>
+                        <div class="community-price">（原价¥9299）</div>
+                    </div>
+                    <div class="community-item">
+                        <div class="community-name">3. 文姐私域增长营</div>
+                        <div class="community-price">（原价¥999）</div>
+                    </div>
+                    <div class="community-item">
+                        <div class="community-name">4. 胜哥金流阁精英班</div>
+                        <div class="community-price">（原价¥1499）🔥</div>
+                    </div>
+                </div>
+                <div class="discount-note">
+                    通过我加入以上圈子均有专属优惠！
+                </div>
+            </div>
+
+            <div class="section">
+                <h2><span class="emoji">💎</span>我能提供的价值</h2>
+                <div class="services">
+                    <div class="service-item">
+                        <strong>1. 购房决策与避坑完整指南</strong>
+                    </div>
+                    <div class="service-item">
+                        <strong>2. 儿童面部彩绘从入门到变现</strong>
+                    </div>
+                    <div class="service-item">
+                        <strong>3. AI写作与编程学习经验分享</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>正在探索<span class="highlight">AI领域的新机遇</span>，欢迎同频朋友一起交流成长！</p>
+            <p style="margin-top: 15px;">感恩相遇，期待与志同道合的你共创美好未来～</p>
+        </div>
+    </div>
+</body>
+</html>

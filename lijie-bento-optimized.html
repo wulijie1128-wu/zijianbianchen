@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>莉洁 | 多元事业女性</title>
+
+    <!-- TailwindCSS 3.0+ -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Chart.js for Data Visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Apple-style Compact Bento Grid System */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 8px;
+            max-width: 1920px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .bento-card {
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            position: relative;
+            min-height: 100px;
+        }
+
+        .bento-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Grid Sizes */
+        .grid-span-2 { grid-column: span 2; }
+        .grid-span-3 { grid-column: span 3; }
+        .grid-span-4 { grid-column: span 4; }
+        .grid-span-5 { grid-column: span 5; }
+        .grid-span-6 { grid-column: span 6; }
+        .grid-span-7 { grid-column: span 7; }
+        .grid-span-8 { grid-column: span 8; }
+        .grid-span-12 { grid-column: span 12; }
+
+        .row-span-2 { grid-row: span 2; }
+
+        /* Gradient Colors */
+        .gradient-blue {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.8) 0%, rgba(59, 130, 246, 0.1) 100%);
+        }
+
+        .gradient-purple {
+            background: linear-gradient(135deg, rgba(147, 51, 234, 0.8) 0%, rgba(147, 51, 234, 0.1) 100%);
+        }
+
+        .gradient-green {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.8) 0%, rgba(34, 197, 94, 0.1) 100%);
+        }
+
+        .gradient-orange {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.8) 0%, rgba(249, 115, 22, 0.1) 100%);
+        }
+
+        .gradient-pink {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.8) 0%, rgba(236, 72, 153, 0.1) 100%);
+        }
+
+        .gradient-cyan {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.8) 0%, rgba(6, 182, 212, 0.1) 100%);
+        }
+
+        /* Typography */
+        .chinese-title {
+            font-size: clamp(1.8rem, 3.5vw, 3rem);
+            font-weight: 800;
+            color: #1f2937;
+            line-height: 1.1;
+        }
+
+        .english-subtitle {
+            font-size: clamp(0.75rem, 1.2vw, 1rem);
+            color: #6b7280;
+            font-weight: 500;
+            margin-top: 0.25rem;
+        }
+
+        /* Icons */
+        .icon-large {
+            font-size: clamp(1.8rem, 2.5vw, 2.5rem);
+        }
+
+        .icon-medium {
+            font-size: clamp(1.2rem, 2vw, 1.8rem);
+        }
+
+        /* Data Visualization */
+        .chart-container {
+            height: 160px;
+            position: relative;
+        }
+
+        /* Animation */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .fade-in-delay-1 { animation-delay: 0.1s; }
+        .fade-in-delay-2 { animation-delay: 0.2s; }
+        .fade-in-delay-3 { animation-delay: 0.3s; }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Line Graphics */
+        .line-graphic {
+            position: absolute;
+            right: 0.8rem;
+            top: 0.8rem;
+            width: 40px;
+            height: 40px;
+            opacity: 0.2;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .bento-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 12px;
+            }
+
+            .grid-span-2, .grid-span-3, .grid-span-4,
+            .grid-span-5, .grid-span-6, .grid-span-7, .grid-span-8, .grid-span-12 {
+                grid-column: span 1;
+            }
+
+            .row-span-2 {
+                grid-row: span 1;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .bento-grid {
+                grid-template-columns: repeat(8, 1fr);
+                gap: 6px;
+                padding: 16px;
+            }
+
+            .grid-span-7, .grid-span-8, .grid-span-12 {
+                grid-column: span 8;
+            }
+            .grid-span-5, .grid-span-6 {
+                grid-column: span 4;
+            }
+        }
+
+        @media (min-width: 1025px) and (max-width: 1440px) {
+            .bento-grid {
+                gap: 10px;
+                padding: 20px;
+            }
+        }
+
+        @media (min-width: 1920px) {
+            .bento-grid {
+                gap: 12px;
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <div class="bento-grid">
+        <!-- Main Profile Card -->
+        <div class="bento-card grid-span-8 row-span-2 p-4 gradient-blue relative fade-in">
+            <div class="line-graphic">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 8L32 32M32 8L8 32" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+                    <circle cx="20" cy="20" r="10" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.4"/>
+                </svg>
+            </div>
+            <div class="flex flex-col lg:flex-row items-start lg:items-center gap-4">
+                <div class="w-20 h-20 lg:w-24 lg:h-24 bg-white rounded-2xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-user icon-medium text-blue-500"></i>
+                </div>
+                <div class="flex-1">
+                    <h1 class="chinese-title mb-1">莉洁</h1>
+                    <p class="english-subtitle">Multi-talented Entrepreneur & Mom</p>
+                    <div class="mt-3 space-y-1">
+                        <div class="flex items-center text-gray-700">
+                            <i class="fas fa-map-marker-alt mr-2 text-blue-500 text-sm"></i>
+                            <span class="font-semibold">湖北武汉</span>
+                            <span class="english-subtitle ml-2">Wuhan, Hubei</span>
+                        </div>
+                        <div class="flex items-center text-gray-700">
+                            <i class="fas fa-heart mr-2 text-pink-500 text-sm"></i>
+                            <span class="font-semibold">9岁女孩的妈妈</span>
+                            <span class="english-subtitle ml-2">Mother of 9-year-old</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real Estate Achievement -->
+        <div class="bento-card grid-span-4 p-4 gradient-green relative fade-in fade-in-delay-1">
+            <div class="line-graphic">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="12" y="16" width="16" height="12" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.3"/>
+                    <path d="M8 20L20 12L32 20" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+                </svg>
+            </div>
+            <div class="relative z-10">
+                <i class="fas fa-building icon-medium text-green-600 mb-2"></i>
+                <h3 class="text-lg font-bold text-gray-800 mb-0.5">房地产销售</h3>
+                <p class="english-subtitle mb-2">Real Estate Sales</p>
+                <div class="text-3xl font-black text-green-600 mb-1">10W+</div>
+                <p class="text-gray-700 text-sm font-medium">年度业绩突破</p>
+            </div>
+        </div>
+
+        <!-- Weight Loss Achievement -->
+        <div class="bento-card grid-span-4 p-4 gradient-pink relative fade-in fade-in-delay-1">
+            <div class="line-graphic">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 8C23 11 26 14 20 24C14 14 17 11 20 8Z" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.3"/>
+                    <circle cx="20" cy="30" r="5" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.4"/>
+                </svg>
+            </div>
+            <div class="relative z-10">
+                <i class="fas fa-heart icon-medium text-pink-600 mb-2"></i>
+                <h3 class="text-lg font-bold text-gray-800 mb-0.5">产后科学瘦身</h3>
+                <p class="english-subtitle mb-2">Postpartum Weight Loss</p>
+                <div class="text-3xl font-black text-pink-600 mb-1">40斤</div>
+                <p class="text-gray-700 text-sm font-medium">130→90斤</p>
+            </div>
+        </div>
+
+        <!-- Face Painting Business -->
+        <div class="bento-card grid-span-4 p-3 gradient-purple relative fade-in fade-in-delay-2">
+            <div class="line-graphic">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="20" cy="18" r="8" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.3"/>
+                    <path d="M15 28Q20 25 25 28" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+                </svg>
+            </div>
+            <div class="relative z-10">
+                <i class="fas fa-palette icon-medium text-purple-600 mb-2"></i>
+                <h3 class="text-base font-bold text-gray-800 mb-0.5">儿童面部彩绘</h3>
+                <p class="english-subtitle mb-1">Face Painting</p>
+                <div class="text-2xl font-black text-purple-600">6000+</div>
+                <p class="text-gray-700 text-xs font-medium">副业月收入</p>
+            </div>
+        </div>
+
+        <!-- E-commerce -->
+        <div class="bento-card grid-span-4 p-3 gradient-orange relative fade-in fade-in-delay-2">
+            <div class="line-graphic">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="12" y="18" width="16" height="10" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.3"/>
+                    <path d="M12 18L15 12L25 12L28 18" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+                </svg>
+            </div>
+            <div class="relative z-10">
+                <i class="fas fa-store icon-medium text-orange-600 mb-2"></i>
+                <h3 class="text-base font-bold text-gray-800 mb-0.5">精品微商运营</h3>
+                <p class="english-subtitle mb-1">E-commerce</p>
+                <div class="text-2xl font-black text-orange-600">3000+</div>
+                <p class="text-gray-700 text-xs font-medium">月收益</p>
+            </div>
+        </div>
+
+        <!-- Premium Communities Section -->
+        <div class="bento-card grid-span-8 p-4 gradient-cyan fade-in fade-in-delay-3">
+            <div class="flex items-center mb-3">
+                <i class="fas fa-users icon-medium text-cyan-600 mr-3"></i>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800">优质圈层资源</h3>
+                    <p class="english-subtitle">Premium Community Resources</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                <div class="bg-white/60 rounded-lg p-2">
+                    <h4 class="font-bold text-gray-800 text-xs mb-0.5">破局行动家高阶社群</h4>
+                    <p class="text-xs text-gray-600 mb-1">Elite Action-Taker</p>
+                    <div class="text-sm font-bold text-cyan-600">¥18,000</div>
+                </div>
+
+                <div class="bg-white/60 rounded-lg p-2">
+                    <h4 class="font-bold text-gray-800 text-xs mb-0.5">彩卉企业家内部群</h4>
+                    <p class="text-xs text-gray-600 mb-1">Entrepreneur Circle</p>
+                    <div class="text-sm font-bold text-cyan-600">¥9,299</div>
+                </div>
+
+                <div class="bg-white/60 rounded-lg p-2">
+                    <h4 class="font-bold text-gray-800 text-xs mb-0.5">文姐私域增长营</h4>
+                    <p class="text-xs text-gray-600 mb-1">Growth Camp</p>
+                    <div class="text-sm font-bold text-cyan-600">¥999</div>
+                </div>
+
+                <div class="bg-white/60 rounded-lg p-2">
+                    <h4 class="font-bold text-gray-800 text-xs mb-0.5">胜哥金流阁精英班</h4>
+                    <p class="text-xs text-gray-600 mb-1">Cash Flow Class</p>
+                    <div class="text-sm font-bold text-cyan-600">¥1,499</div>
+                </div>
+            </div>
+
+            <div class="mt-2 p-2 bg-gradient-to-r from-yellow-400/30 to-orange-400/30 rounded-lg">
+                <div class="flex items-center">
+                    <i class="fas fa-fire text-orange-500 mr-2 text-sm"></i>
+                    <span class="font-bold text-gray-800 text-sm">通过我加入以上圈子均有专属优惠！</span>
+                </div>
+                <p class="english-subtitle text-xs mt-0.5">Exclusive discounts available!</p>
+            </div>
+        </div>
+
+        <!-- Value Proposition -->
+        <div class="bento-card grid-span-6 p-4 fade-in fade-in-delay-3">
+            <div class="flex items-center mb-3">
+                <i class="fas fa-star icon-medium text-yellow-500 mr-3"></i>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800">我能提供的价值</h3>
+                    <p class="english-subtitle">Value I Can Provide</p>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <div class="flex items-start space-x-3">
+                    <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-home text-blue-600 text-sm"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-800 text-sm">购房决策与避坑完整指南</h4>
+                        <p class="english-subtitle text-xs">Home Buying Guide</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start space-x-3">
+                    <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-palette text-purple-600 text-sm"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-800 text-sm">儿童面部彩绘从入门到变现</h4>
+                        <p class="english-subtitle text-xs">Face Painting Training</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start space-x-3">
+                    <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-robot text-green-600 text-sm"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-800 text-sm">AI写作与编程学习经验分享</h4>
+                        <p class="english-subtitle text-xs">AI Learning Experience</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievement Chart -->
+        <div class="bento-card grid-span-6 p-4 fade-in fade-in-delay-1">
+            <h3 class="text-base font-bold text-gray-800 mb-2 flex items-center">
+                <i class="fas fa-chart-line text-blue-500 mr-2 text-sm"></i>
+                收入多元化
+                <span class="english-subtitle ml-2">Revenue Chart</span>
+            </h3>
+            <div class="chart-container">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Future Vision -->
+        <div class="bento-card grid-span-8 p-4 gradient-purple fade-in fade-in-delay-2">
+            <div class="text-center">
+                <i class="fas fa-rocket icon-large text-purple-600 mb-2"></i>
+                <h3 class="text-xl font-bold text-white mb-1">正在探索AI领域的新机遇</h3>
+                <p class="text-purple-100 mb-3">Exploring New Opportunities in AI Field</p>
+                <div class="bg-white/20 rounded-lg p-3">
+                    <p class="text-white font-semibold">期待与志同道合的你共创美好</p>
+                    <p class="text-purple-100 text-sm">Looking forward to creating a better future together</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact CTA -->
+        <div class="bento-card grid-span-12 p-4 bg-gradient-to-r from-gray-900 to-gray-800 text-white fade-in fade-in-delay-3">
+            <div class="text-center">
+                <h3 class="text-xl lg:text-2xl font-bold mb-2">
+                    <i class="fas fa-handshake mr-3 text-blue-400"></i>
+                    让我们一起创造更多可能
+                </h3>
+                <p class="english-subtitle text-gray-300 mb-4">Let's Create More Possibilities Together</p>
+
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div class="text-center">
+                        <i class="fas fa-home text-2xl text-blue-400 mb-1"></i>
+                        <p class="font-semibold text-sm">房地产咨询</p>
+                        <p class="text-xs text-gray-400">Real Estate</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-palette text-2xl text-purple-400 mb-1"></i>
+                        <p class="font-semibold text-sm">彩绘培训</p>
+                        <p class="text-xs text-gray-400">Face Painting</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-users text-2xl text-green-400 mb-1"></i>
+                        <p class="font-semibold text-sm">圈层资源</p>
+                        <p class="text-xs text-gray-400">Community</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-robot text-2xl text-cyan-400 mb-1"></i>
+                        <p class="font-semibold text-sm">AI学习</p>
+                        <p class="text-xs text-gray-400">AI Learning</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Chart.js Revenue Diversification Chart
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        const revenueChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['房地产销售', '面部彩绘', '微商运营', 'AI探索'],
+                datasets: [{
+                    data: [55, 25, 15, 5],
+                    backgroundColor: [
+                        'rgba(34, 197, 94, 0.8)',
+                        'rgba(147, 51, 234, 0.8)',
+                        'rgba(249, 115, 22, 0.8)',
+                        'rgba(6, 182, 212, 0.8)'
+                    ],
+                    borderWidth: 0,
+                    cutout: '70%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            usePointStyle: true,
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -30px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all bento cards
+        document.querySelectorAll('.bento-card').forEach(card => {
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
