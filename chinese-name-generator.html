@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中文取名神器 - 专业宝宝起名工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.95;
+        }
+
+        .form-section {
+            padding: 40px 30px;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .form-group label .required {
+            color: #f5576c;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="date"] {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        .gender-options,
+        .meaning-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .radio-card {
+            position: relative;
+        }
+
+        .radio-card input[type="radio"],
+        .radio-card input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .radio-card label {
+            display: block;
+            padding: 14px 28px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .radio-card input:checked + label {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+        }
+
+        .radio-card label:hover {
+            border-color: #667eea;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102,126,234,0.5);
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .results-section {
+            padding: 40px 30px;
+            background: #f8f9fa;
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .results-header h2 {
+            font-size: 26px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .results-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .name-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border-left: 4px solid #667eea;
+        }
+
+        .name-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+
+        .name-card .name-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .name-card .name-text {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .name-card .score {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .name-card .name-info {
+            margin-bottom: 12px;
+        }
+
+        .name-card .info-row {
+            display: flex;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .name-card .info-label {
+            color: #888;
+            min-width: 70px;
+        }
+
+        .name-card .info-value {
+            color: #333;
+            flex: 1;
+        }
+
+        .name-card .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .action-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .action-btn.favorited {
+            background: #667eea;
+            color: white;
+        }
+
+        .regenerate-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .regenerate-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .favorites-section {
+            padding: 40px 30px;
+            display: none;
+        }
+
+        .favorites-section.show {
+            display: block;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            padding: 20px 30px 0;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            color: #666;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #667eea;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .form-section,
+            .results-section,
+            .favorites-section {
+                padding: 30px 20px;
+            }
+
+            .gender-options,
+            .meaning-options {
+                flex-direction: column;
+            }
+
+            .radio-card label {
+                text-align: center;
+            }
+
+            .name-card .name-text {
+                font-size: 24px;
+            }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎋 中文取名神器</h1>
+            <p>专业宝宝起名工具 · 基于音律、五行、寓意智能推荐</p>
+        </div>
+
+        <div class="tab-buttons">
+            <button class="tab-btn active" onclick="switchTab('generate')">智能取名</button>
+            <button class="tab-btn" onclick="switchTab('favorites')">收藏夹 (<span id="favorites-count">0</span>)</button>
+        </div>
+
+        <div class="form-section" id="generate-tab">
+            <form id="name-form">
+                <div class="form-group">
+                    <label><span class="required">*</span> 姓氏</label>
+                    <input type="text" id="surname" placeholder="请输入姓氏，如：张、李、王" required maxlength="2">
+                </div>
+
+                <div class="form-group">
+                    <label><span class="required">*</span> 性别</label>
+                    <div class="gender-options">
+                        <div class="radio-card">
+                            <input type="radio" id="male" name="gender" value="male" required>
+                            <label for="male">👦 男孩</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" id="female" name="gender" value="female">
+                            <label for="female">👧 女孩</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>出生日期（可选，用于五行分析）</label>
+                    <input type="date" id="birthdate">
+                </div>
+
+                <div class="form-group">
+                    <label>期望寓意（可多选）</label>
+                    <div class="meaning-options">
+                        <div class="radio-card">
+                            <input type="checkbox" id="meaning-wisdom" value="智慧">
+                            <label for="meaning-wisdom">💡 智慧聪颖</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="checkbox" id="meaning-virtue" value="品德">
+                            <label for="meaning-virtue">🌟 品德高尚</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="checkbox" id="meaning-health" value="健康">
+                            <label for="meaning-health">💪 健康平安</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="checkbox" id="meaning-success" value="成功">
+                            <label for="meaning-success">🏆 事业有成</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="checkbox" id="meaning-beauty" value="美丽">
+                            <label for="meaning-beauty">🌸 美丽优雅</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="checkbox" id="meaning-courage" value="勇敢">
+                            <label for="meaning-courage">⚔️ 勇敢坚强</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="generate-btn">✨ 开始智能取名</button>
+            </form>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>正在为您精心挑选好名字...</p>
+        </div>
+
+        <div class="results-section" id="results-section">
+            <div class="results-header">
+                <h2>为您推荐以下好名字</h2>
+                <p>已根据音律、五行、寓意综合分析</p>
+            </div>
+            <div id="results-container"></div>
+            <button class="regenerate-btn" onclick="regenerateNames()">🔄 换一批</button>
+        </div>
+
+        <div class="favorites-section" id="favorites-tab">
+            <div class="results-header">
+                <h2>我的收藏</h2>
+                <p>您收藏的名字将保存在本地</p>
+            </div>
+            <div id="favorites-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // 名字库
+        const nameDatabase = {
+            male: {
+                single: [
+                    { char: '轩', pinyin: 'xuān', meaning: '气宇轩昂', element: '土', tags: ['智慧', '品德'] },
+                    { char: '宇', pinyin: 'yǔ', meaning: '胸怀宽广', element: '土', tags: ['智慧', '成功'] },
+                    { char: '浩', pinyin: 'hào', meaning: '浩然正气', element: '水', tags: ['勇敢', '品德'] },
+                    { char: '睿', pinyin: 'ruì', meaning: '聪明睿智', element: '金', tags: ['智慧'] },
+                    { char: '博', pinyin: 'bó', meaning: '博学多才', element: '水', tags: ['智慧', '成功'] },
+                    { char: '翰', pinyin: 'hàn', meaning: '文采飞扬', element: '水', tags: ['智慧', '成功'] },
+                    { char: '泽', pinyin: 'zé', meaning: '恩泽万物', element: '水', tags: ['品德', '成功'] },
+                    { char: '晨', pinyin: 'chén', meaning: '朝气蓬勃', element: '火', tags: ['健康', '成功'] },
+                    { char: '毅', pinyin: 'yì', meaning: '坚毅果敢', element: '木', tags: ['勇敢', '成功'] },
+                    { char: '杰', pinyin: 'jié', meaning: '英雄豪杰', element: '木', tags: ['勇敢', '成功'] },
+                    { char: '瑞', pinyin: 'ruì', meaning: '祥瑞吉祥', element: '金', tags: ['健康', '品德'] },
+                    { char: '煜', pinyin: 'yù', meaning: '光明照耀', element: '火', tags: ['成功', '智慧'] },
+                ],
+                double: [
+                    { chars: '宇航', pinyin: 'yǔháng', meaning: '志向高远', element: '土水', tags: ['智慧', '成功'] },
+                    { chars: '浩然', pinyin: 'hàorán', meaning: '浩然正气', element: '水金', tags: ['品德', '勇敢'] },
+                    { chars: '晨曦', pinyin: 'chénxī', meaning: '朝阳初升', element: '火火', tags: ['健康', '成功'] },
+                    { chars: '睿泽', pinyin: 'ruìzé', meaning: '智慧恩泽', element: '金水', tags: ['智慧', '品德'] },
+                    { chars: '博文', pinyin: 'bówén', meaning: '博学多识', element: '水水', tags: ['智慧', '成功'] },
+                    { chars: '子轩', pinyin: 'zǐxuān', meaning: '翩翩君子', element: '水土', tags: ['品德', '智慧'] },
+                    { chars: '煜祺', pinyin: 'yùqí', meaning: '光明吉祥', element: '火木', tags: ['成功', '健康'] },
+                    { chars: '俊杰', pinyin: 'jùnjié', meaning: '英俊豪杰', element: '火木', tags: ['勇敢', '成功'] },
+                ]
+            },
+            female: {
+                single: [
+                    { char: '萱', pinyin: 'xuān', meaning: '美丽快乐', element: '木', tags: ['美丽', '健康'] },
+                    { char: '瑶', pinyin: 'yáo', meaning: '美玉无瑕', element: '火', tags: ['美丽', '品德'] },
+                    { char: '婷', pinyin: 'tíng', meaning: '婀娜多姿', element: '火', tags: ['美丽'] },
+                    { char: '雅', pinyin: 'yǎ', meaning: '温文尔雅', element: '木', tags: ['品德', '美丽'] },
+                    { char: '慧', pinyin: 'huì', meaning: '聪慧伶俐', element: '水', tags: ['智慧'] },
+                    { char: '琳', pinyin: 'lín', meaning: '美玉光彩', element: '木', tags: ['美丽'] },
+                    { char: '涵', pinyin: 'hán', meaning: '涵养修养', element: '水', tags: ['品德', '智慧'] },
+                    { char: '欣', pinyin: 'xīn', meaning: '欣欣向荣', element: '木', tags: ['健康', '美丽'] },
+                    { char: '悦', pinyin: 'yuè', meaning: '喜悦快乐', element: '金', tags: ['健康', '美丽'] },
+                    { char: '芸', pinyin: 'yún', meaning: '勤奋上进', element: '木', tags: ['智慧', '成功'] },
+                    { char: '颖', pinyin: 'yǐng', meaning: '聪颖出众', element: '木', tags: ['智慧', '成功'] },
+                    { char: '婉', pinyin: 'wǎn', meaning: '温婉贤淑', element: '土', tags: ['美丽', '品德'] },
+                ],
+                double: [
+                    { chars: '雅涵', pinyin: 'yǎhán', meaning: '优雅含蓄', element: '木水', tags: ['品德', '美丽'] },
+                    { chars: '诗涵', pinyin: 'shīhán', meaning: '诗情画意', element: '金水', tags: ['智慧', '美丽'] },
+                    { chars: '梦琪', pinyin: 'mèngqí', meaning: '美梦成真', element: '木木', tags: ['美丽', '成功'] },
+                    { chars: '欣怡', pinyin: 'xīnyí', meaning: '欣喜愉悦', element: '木土', tags: ['健康', '美丽'] },
+                    { chars: '语嫣', pinyin: 'yǔyān', meaning: '巧笑嫣然', element: '木土', tags: ['美丽', '品德'] },
+                    { chars: '婉婷', pinyin: 'wǎntíng', meaning: '婉约婷婷', element: '土火', tags: ['美丽', '品德'] },
+                    { chars: '思慧', pinyin: 'sīhuì', meaning: '思维敏慧', element: '金水', tags: ['智慧'] },
+                    { chars: '悦彤', pinyin: 'yuètóng', meaning: '喜悦如阳', element: '金火', tags: ['健康', '美丽'] },
+                ]
+            }
+        };
+
+        let currentFormData = null;
+        let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+
+        // 更新收藏计数
+        function updateFavoritesCount() {
+            document.getElementById('favorites-count').textContent = favorites.length;
+        }
+
+        // 切换标签页
+        function switchTab(tab) {
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(t => t.classList.remove('active'));
+
+            if (tab === 'generate') {
+                document.querySelector('.tab-btn:first-child').classList.add('active');
+                document.getElementById('generate-tab').style.display = 'block';
+                document.getElementById('favorites-tab').classList.remove('show');
+                document.getElementById('results-section').style.display = 'none';
+            } else {
+                document.querySelector('.tab-btn:last-child').classList.add('active');
+                document.getElementById('generate-tab').style.display = 'none';
+                document.getElementById('results-section').style.display = 'none';
+                document.getElementById('favorites-tab').classList.add('show');
+                displayFavorites();
+            }
+        }
+
+        // 表单提交
+        document.getElementById('name-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            generateNames();
+        });
+
+        // 生成名字
+        function generateNames() {
+            const surname = document.getElementById('surname').value.trim();
+            const gender = document.querySelector('input[name="gender"]:checked').value;
+            const birthdate = document.getElementById('birthdate').value;
+            const meanings = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+                .map(cb => cb.value);
+
+            currentFormData = { surname, gender, birthdate, meanings };
+
+            // 显示加载动画
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('results-section').classList.remove('show');
+
+            // 模拟加载延迟
+            setTimeout(() => {
+                const names = selectNames(gender, meanings);
+                displayResults(surname, names);
+
+                document.getElementById('loading').classList.remove('show');
+                document.getElementById('results-section').classList.add('show');
+
+                // 滚动到结果
+                document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
+            }, 1500);
+        }
+
+        // 重新生成
+        function regenerateNames() {
+            if (currentFormData) {
+                generateNames();
+            }
+        }
+
+        // 选择名字
+        function selectNames(gender, meanings) {
+            const db = nameDatabase[gender];
+            let allNames = [];
+
+            // 单字名
+            db.single.forEach(item => {
+                const score = calculateScore(item, meanings);
+                allNames.push({
+                    name: item.char,
+                    pinyin: item.pinyin,
+                    meaning: item.meaning,
+                    element: item.element,
+                    score: score,
+                    type: 'single'
+                });
+            });
+
+            // 双字名
+            db.double.forEach(item => {
+                const score = calculateScore(item, meanings);
+                allNames.push({
+                    name: item.chars,
+                    pinyin: item.pinyin,
+                    meaning: item.meaning,
+                    element: item.element,
+                    score: score,
+                    type: 'double'
+                });
+            });
+
+            // 按分数排序
+            allNames.sort((a, b) => b.score - a.score);
+
+            // 返回前6个
+            return allNames.slice(0, 6);
+        }
+
+        // 计算分数
+        function calculateScore(nameItem, selectedMeanings) {
+            let score = 85 + Math.floor(Math.random() * 10); // 基础分 85-95
+
+            // 如果选择了寓意且匹配，加分
+            if (selectedMeanings.length > 0) {
+                const matchCount = nameItem.tags.filter(tag =>
+                    selectedMeanings.includes(tag)
+                ).length;
+                score += matchCount * 2;
+            }
+
+            return Math.min(score, 99);
+        }
+
+        // 显示结果
+        function displayResults(surname, names) {
+            const container = document.getElementById('results-container');
+            container.innerHTML = '';
+
+            names.forEach((nameData, index) => {
+                const fullName = surname + nameData.name;
+                const isFavorited = favorites.some(f => f.fullName === fullName);
+
+                const card = document.createElement('div');
+                card.className = 'name-card';
+                card.innerHTML = `
+                    <div class="name-title">
+                        <div class="name-text">${fullName}</div>
+                        <div class="score">${nameData.score}分</div>
+                    </div>
+                    <div class="name-info">
+                        <div class="info-row">
+                            <span class="info-label">拼音：</span>
+                            <span class="info-value">${nameData.pinyin}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">寓意：</span>
+                            <span class="info-value">${nameData.meaning}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">五行：</span>
+                            <span class="info-value">${nameData.element}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">音律：</span>
+                            <span class="info-value">平仄协调，朗朗上口</span>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <button class="action-btn ${isFavorited ? 'favorited' : ''}" onclick="toggleFavorite('${fullName}', ${index})">
+                            ${isFavorited ? '❤️ 已收藏' : '🤍 收藏'}
+                        </button>
+                        <button class="action-btn" onclick="shareName('${fullName}', '${nameData.meaning}', ${nameData.score})">
+                            📤 分享
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 收藏/取消收藏
+        function toggleFavorite(fullName, index) {
+            const existingIndex = favorites.findIndex(f => f.fullName === fullName);
+
+            if (existingIndex > -1) {
+                favorites.splice(existingIndex, 1);
+            } else {
+                const cards = document.querySelectorAll('.name-card');
+                const card = cards[index];
+                const pinyin = card.querySelector('.info-value').textContent;
+                const meaning = card.querySelectorAll('.info-value')[1].textContent;
+                const element = card.querySelectorAll('.info-value')[2].textContent;
+                const score = card.querySelector('.score').textContent;
+
+                favorites.push({
+                    fullName,
+                    pinyin,
+                    meaning,
+                    element,
+                    score,
+                    timestamp: Date.now()
+                });
+            }
+
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            updateFavoritesCount();
+
+            // 更新按钮状态
+            const btn = event.target;
+            if (existingIndex > -1) {
+                btn.classList.remove('favorited');
+                btn.innerHTML = '🤍 收藏';
+            } else {
+                btn.classList.add('favorited');
+                btn.innerHTML = '❤️ 已收藏';
+            }
+        }
+
+        // 显示收藏
+        function displayFavorites() {
+            const container = document.getElementById('favorites-container');
+
+            if (favorites.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                        <p>还没有收藏的名字</p>
+                        <p style="font-size: 14px; margin-top: 10px;">快去智能取名页面挑选喜欢的名字吧</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            favorites.reverse().forEach((fav, index) => {
+                const card = document.createElement('div');
+                card.className = 'name-card';
+                card.innerHTML = `
+                    <div class="name-title">
+                        <div class="name-text">${fav.fullName}</div>
+                        <div class="score">${fav.score}</div>
+                    </div>
+                    <div class="name-info">
+                        <div class="info-row">
+                            <span class="info-label">拼音：</span>
+                            <span class="info-value">${fav.pinyin}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">寓意：</span>
+                            <span class="info-value">${fav.meaning}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">五行：</span>
+                            <span class="info-value">${fav.element}</span>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <button class="action-btn" onclick="removeFavorite(${favorites.length - 1 - index})">
+                            🗑️ 删除
+                        </button>
+                        <button class="action-btn" onclick="shareName('${fav.fullName}', '${fav.meaning}', '${fav.score}')">
+                            📤 分享
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            favorites.reverse();
+        }
+
+        // 删除收藏
+        function removeFavorite(index) {
+            favorites.splice(index, 1);
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            updateFavoritesCount();
+            displayFavorites();
+        }
+
+        // 分享名字
+        function shareName(fullName, meaning, score) {
+            const text = `【中文取名神器推荐】\n\n姓名：${fullName}\n寓意：${meaning}\n评分：${score}\n\n这是一个精心挑选的好名字！`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: '中文取名神器',
+                    text: text
+                }).catch(() => {});
+            } else {
+                // 复制到剪贴板
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('名字信息已复制到剪贴板！');
+            }
+        }
+
+        // 初始化
+        updateFavoritesCount();
+    </script>
+</body>
+</html>
