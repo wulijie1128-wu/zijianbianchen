@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片处理工具集 | Image Tools Hub</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 56px;
+            font-weight: 900;
+            margin-bottom: 15px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 20px;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+
+        /* Tools Grid */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        /* Tool Card */
+        .tool-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .tool-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Icon */
+        .tool-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 25px;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .tool-card:hover .tool-icon {
+            transform: rotateY(360deg);
+        }
+
+        /* Title and Description */
+        .tool-title {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: #1a202c;
+        }
+
+        .tool-subtitle {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .tool-description {
+            font-size: 15px;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        /* Button */
+        .tool-button {
+            display: inline-block;
+            padding: 12px 32px;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 16px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .tool-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Color Schemes */
+        .compress {
+            --gradient-start: #f093fb;
+            --gradient-end: #f5576c;
+        }
+
+        .remove-bg {
+            --gradient-start: #4facfe;
+            --gradient-end: #00f2fe;
+        }
+
+        .recognize {
+            --gradient-start: #43e97b;
+            --gradient-end: #38f9d7;
+        }
+
+        .ai-generate {
+            --gradient-start: #fa709a;
+            --gradient-end: #fee140;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 30px 0;
+        }
+
+        .footer-text {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            opacity: 0.9;
+        }
+
+        .footer-link:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 36px;
+            }
+
+            .header p {
+                font-size: 16px;
+            }
+
+            .tools-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .tool-card {
+                padding: 30px 20px;
+            }
+
+            .tool-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 40px;
+            }
+
+            .tool-title {
+                font-size: 22px;
+            }
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .tool-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .tool-card:nth-child(1) .tool-icon { animation-delay: 0s; }
+        .tool-card:nth-child(2) .tool-icon { animation-delay: 0.2s; }
+        .tool-card:nth-child(3) .tool-icon { animation-delay: 0.4s; }
+        .tool-card:nth-child(4) .tool-icon { animation-delay: 0.6s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎨 图片处理工具集</h1>
+            <p>Image Tools Hub - 一站式图片处理解决方案</p>
+        </div>
+
+        <!-- Tools Grid -->
+        <div class="tools-grid">
+            <!-- 图片压缩 -->
+            <div class="tool-card compress">
+                <span class="badge">COMPRESS</span>
+                <div class="tool-icon">📦</div>
+                <h2 class="tool-title">图片压缩</h2>
+                <p class="tool-subtitle">Image Compression</p>
+                <p class="tool-description">
+                    快速压缩图片大小，支持批量处理，保持高质量的同时大幅减小文件体积，提升网站加载速度
+                </p>
+                <a href="compress.html" class="tool-button">开始压缩</a>
+            </div>
+
+            <!-- 抠图去背景 -->
+            <div class="tool-card remove-bg">
+                <span class="badge">REMOVE BG</span>
+                <div class="tool-icon">✂️</div>
+                <h2 class="tool-title">抠图去背景</h2>
+                <p class="tool-subtitle">Background Removal</p>
+                <p class="tool-description">
+                    智能AI抠图，一键移除图片背景，支持人像、商品等多种场景，让图片处理更简单高效
+                </p>
+                <a href="remove-bg.html" class="tool-button">去除背景</a>
+            </div>
+
+            <!-- 图片识别 -->
+            <div class="tool-card recognize">
+                <span class="badge">RECOGNIZE</span>
+                <div class="tool-icon">🔍</div>
+                <h2 class="tool-title">图片识别</h2>
+                <p class="tool-subtitle">Image Recognition</p>
+                <p class="tool-description">
+                    AI智能识别图片内容，提取文字、识别物体、检测场景，为您的图片提供详细的分析报告
+                </p>
+                <a href="recognize.html" class="tool-button">开始识别</a>
+            </div>
+
+            <!-- AI生图 -->
+            <div class="tool-card ai-generate">
+                <span class="badge">AI GENERATE</span>
+                <div class="tool-icon">🤖</div>
+                <h2 class="tool-title">AI 生图</h2>
+                <p class="tool-subtitle">AI Image Generation</p>
+                <p class="tool-description">
+                    使用先进的AI技术，通过文字描述生成独特的图片，让创意无限，轻松实现艺术创作梦想
+                </p>
+                <a href="ai-generate.html" class="tool-button">创作图片</a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p class="footer-text">💡 选择您需要的工具，开始您的图片处理之旅</p>
+            <div class="footer-links">
+                <a href="#" class="footer-link">关于我们</a>
+                <a href="#" class="footer-link">使用帮助</a>
+                <a href="#" class="footer-link">隐私政策</a>
+                <a href="#" class="footer-link">联系我们</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 添加点击效果
+        document.querySelectorAll('.tool-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // 如果点击的不是按钮，则导航到对应页面
+                if (!e.target.classList.contains('tool-button')) {
+                    const button = this.querySelector('.tool-button');
+                    if (button) {
+                        window.location.href = button.href;
+                    }
+                }
+            });
+        });
+
+        // 添加进入动画
+        window.addEventListener('load', () => {
+            const cards = document.querySelectorAll('.tool-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(30px)';
+                    card.style.transition = 'all 0.6s ease';
+
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 50);
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

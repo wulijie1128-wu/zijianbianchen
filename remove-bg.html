@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抠图去背景 | Background Removal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateX(-5px);
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.95;
+        }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .upload-area {
+            border: 3px dashed #4facfe;
+            border-radius: 16px;
+            padding: 60px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.05) 0%, rgba(0, 242, 254, 0.05) 100%);
+        }
+
+        .upload-area:hover {
+            border-color: #00f2fe;
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
+        }
+
+        .upload-area.dragover {
+            border-color: #00f2fe;
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.15) 0%, rgba(0, 242, 254, 0.15) 100%);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 72px;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .info-box {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
+            border-radius: 16px;
+            border-left: 5px solid #4facfe;
+        }
+
+        .info-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-list li {
+            font-size: 14px;
+            color: #4a5568;
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-list li::before {
+            content: '✓';
+            color: #4facfe;
+            font-weight: 900;
+            font-size: 18px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #4facfe;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .preview-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .preview-section.active {
+            display: block;
+        }
+
+        .preview-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .background-selector {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .bg-label {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 15px;
+        }
+
+        .bg-options {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .bg-option {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .bg-option:hover {
+            transform: scale(1.1);
+        }
+
+        .bg-option.active {
+            border-color: #4facfe;
+            box-shadow: 0 0 15px rgba(79, 172, 254, 0.5);
+        }
+
+        .bg-transparent {
+            background:
+                linear-gradient(45deg, #ccc 25%, transparent 25%),
+                linear-gradient(-45deg, #ccc 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #ccc 75%),
+                linear-gradient(-45deg, transparent 75%, #ccc 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        .bg-white { background: white; }
+        .bg-black { background: #000; }
+        .bg-red { background: linear-gradient(135deg, #ff6b6b, #ee5a6f); }
+        .bg-blue { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .bg-green { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+        .bg-purple { background: linear-gradient(135deg, #a78bfa, #8b5cf6); }
+
+        .canvas-container {
+            text-align: center;
+            margin: 20px 0;
+            background:
+                linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
+                linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
+                linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+            background-size: 30px 30px;
+            background-position: 0 0, 0 15px, 15px -15px, -15px 0px;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        #resultCanvas {
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.5);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .demo-note {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fef3c7;
+            border-left: 5px solid #f59e0b;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #92400e;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 32px; }
+            .card { padding: 25px; }
+            .back-btn {
+                position: static;
+                display: inline-block;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="image-tools-hub.html" class="back-btn">← 返回首页</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>✂️ 抠图去背景</h1>
+            <p>AI智能抠图，一键移除背景</p>
+        </div>
+
+        <div class="card">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">🖼️</div>
+                <div class="upload-text">点击或拖拽图片到此处</div>
+                <div class="upload-hint">支持 JPG、PNG 格式，最大 10MB</div>
+                <input type="file" id="fileInput" accept="image/jpeg,image/png">
+            </div>
+
+            <div class="info-box">
+                <div class="info-title">
+                    <span>💡</span>
+                    <span>功能特点</span>
+                </div>
+                <ul class="info-list">
+                    <li>AI智能识别主体，精准去除背景</li>
+                    <li>支持人像、商品、动物等多种场景</li>
+                    <li>提供多种背景颜色选择</li>
+                    <li>高清输出，保持图片质量</li>
+                </ul>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div>正在处理图片...</div>
+            </div>
+
+            <div class="preview-section" id="previewSection">
+                <div class="canvas-container">
+                    <canvas id="resultCanvas"></canvas>
+                </div>
+
+                <div class="background-selector">
+                    <div class="bg-label">选择背景</div>
+                    <div class="bg-options">
+                        <div class="bg-option bg-transparent active" data-bg="transparent" title="透明"></div>
+                        <div class="bg-option bg-white" data-bg="white" title="白色"></div>
+                        <div class="bg-option bg-black" data-bg="black" title="黑色"></div>
+                        <div class="bg-option bg-red" data-bg="red" title="红色"></div>
+                        <div class="bg-option bg-blue" data-bg="blue" title="蓝色"></div>
+                        <div class="bg-option bg-green" data-bg="green" title="绿色"></div>
+                        <div class="bg-option bg-purple" data-bg="purple" title="紫色"></div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" id="downloadBtn">💾 下载图片</button>
+                    <button class="btn btn-secondary" id="resetBtn">🔄 重新选择</button>
+                </div>
+
+                <div class="demo-note">
+                    <strong>⚠️ 演示版本说明：</strong> 这是前端演示版本，使用简单的边缘检测算法。生产环境建议接入专业的AI抠图API（如 Remove.bg、阿里云视觉智能等）以获得更好的效果。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const loading = document.getElementById('loading');
+        const previewSection = document.getElementById('previewSection');
+        const resultCanvas = document.getElementById('resultCanvas');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const bgOptions = document.querySelectorAll('.bg-option');
+
+        let processedImageData = null;
+        let currentBg = 'transparent';
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('请选择图片文件！');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                alert('文件大小不能超过 10MB！');
+                return;
+            }
+
+            loading.classList.add('active');
+            previewSection.classList.remove('active');
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    removeBackground(img);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeBackground(img) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+
+            // 简单的背景移除算法（演示用）
+            // 实际应用中应使用专业的AI抠图服务
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+
+                // 检测接近白色或单一颜色的背景
+                const isBackground = (
+                    (r > 200 && g > 200 && b > 200) || // 白色背景
+                    (Math.abs(r - g) < 30 && Math.abs(g - b) < 30 && Math.abs(r - b) < 30) // 单色背景
+                );
+
+                if (isBackground) {
+                    data[i + 3] = 0; // 设置为透明
+                }
+            }
+
+            processedImageData = imageData;
+            renderWithBackground(currentBg);
+
+            loading.classList.remove('active');
+            previewSection.classList.add('active');
+        }
+
+        function renderWithBackground(bgType) {
+            if (!processedImageData) return;
+
+            const ctx = resultCanvas.getContext('2d');
+            resultCanvas.width = processedImageData.width;
+            resultCanvas.height = processedImageData.height;
+
+            // 设置背景
+            if (bgType !== 'transparent') {
+                const bgColors = {
+                    'white': '#ffffff',
+                    'black': '#000000',
+                    'red': '#ff6b6b',
+                    'blue': '#4facfe',
+                    'green': '#43e97b',
+                    'purple': '#a78bfa'
+                };
+
+                ctx.fillStyle = bgColors[bgType] || '#ffffff';
+                ctx.fillRect(0, 0, resultCanvas.width, resultCanvas.height);
+            }
+
+            // 绘制处理后的图片
+            ctx.putImageData(processedImageData, 0, 0);
+        }
+
+        // 背景选择
+        bgOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                bgOptions.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                currentBg = option.dataset.bg;
+                renderWithBackground(currentBg);
+            });
+        });
+
+        // 下载
+        downloadBtn.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = `removed-bg-${Date.now()}.png`;
+            link.href = resultCanvas.toDataURL('image/png');
+            link.click();
+        });
+
+        // 重置
+        resetBtn.addEventListener('click', () => {
+            fileInput.value = '';
+            processedImageData = null;
+            previewSection.classList.remove('active');
+            currentBg = 'transparent';
+            bgOptions.forEach((opt, idx) => {
+                opt.classList.toggle('active', idx === 0);
+            });
+        });
+    </script>
+</body>
+</html>

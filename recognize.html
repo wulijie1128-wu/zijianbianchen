@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片识别 | Image Recognition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateX(-5px);
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.95;
+        }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .upload-area {
+            border: 3px dashed #43e97b;
+            border-radius: 16px;
+            padding: 60px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, rgba(67, 233, 123, 0.05) 0%, rgba(56, 249, 215, 0.05) 100%);
+        }
+
+        .upload-area:hover {
+            border-color: #38f9d7;
+            background: linear-gradient(135deg, rgba(67, 233, 123, 0.1) 0%, rgba(56, 249, 215, 0.1) 100%);
+        }
+
+        .upload-area.dragover {
+            border-color: #38f9d7;
+            background: linear-gradient(135deg, rgba(67, 233, 123, 0.15) 0%, rgba(56, 249, 215, 0.15) 100%);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 72px;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #43e97b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .result-section.active {
+            display: block;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .image-preview {
+            text-align: center;
+        }
+
+        .preview-img {
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+        }
+
+        .image-info {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: left;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .info-value {
+            color: #1a202c;
+        }
+
+        .analysis-panel {
+            background: #f7fafc;
+            border-radius: 16px;
+            padding: 25px;
+        }
+
+        .analysis-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .analysis-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #4a5568;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .description {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            line-height: 1.6;
+            color: #4a5568;
+        }
+
+        .confidence-item {
+            margin-bottom: 15px;
+        }
+
+        .confidence-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .label-name {
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .label-value {
+            color: #43e97b;
+            font-weight: 700;
+        }
+
+        .confidence-bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #43e97b, #38f9d7);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+            color: white;
+            box-shadow: 0 4px 15px rgba(67, 233, 123, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 233, 123, 0.5);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .demo-note {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fef3c7;
+            border-left: 5px solid #f59e0b;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #92400e;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 32px; }
+            .card { padding: 25px; }
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+            .back-btn {
+                position: static;
+                display: inline-block;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="image-tools-hub.html" class="back-btn">← 返回首页</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>🔍 图片识别</h1>
+            <p>AI智能分析图片内容</p>
+        </div>
+
+        <div class="card">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">🖼️</div>
+                <div class="upload-text">点击或拖拽图片到此处</div>
+                <div class="upload-hint">支持 JPG、PNG 格式，最大 10MB</div>
+                <input type="file" id="fileInput" accept="image/jpeg,image/png">
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div>正在分析图片...</div>
+            </div>
+
+            <div class="result-section" id="resultSection">
+                <div class="result-grid">
+                    <div class="image-preview">
+                        <img class="preview-img" id="previewImg" src="" alt="Preview">
+                        <div class="image-info">
+                            <div class="info-item">
+                                <span class="info-label">文件名</span>
+                                <span class="info-value" id="fileName">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">尺寸</span>
+                                <span class="info-value" id="dimensions">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">大小</span>
+                                <span class="info-value" id="fileSize">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">类型</span>
+                                <span class="info-value" id="fileType">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="analysis-panel">
+                        <div class="analysis-title">
+                            <span>🤖</span>
+                            <span>AI 分析结果</span>
+                        </div>
+
+                        <div class="analysis-section">
+                            <div class="section-title">
+                                <span>🏷️</span>
+                                <span>识别标签</span>
+                            </div>
+                            <div class="tag-list" id="tagList"></div>
+                        </div>
+
+                        <div class="analysis-section">
+                            <div class="section-title">
+                                <span>📊</span>
+                                <span>置信度分析</span>
+                            </div>
+                            <div id="confidenceList"></div>
+                        </div>
+
+                        <div class="analysis-section">
+                            <div class="section-title">
+                                <span>📝</span>
+                                <span>图片描述</span>
+                            </div>
+                            <div class="description" id="description"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" id="resetBtn">🔄 重新识别</button>
+                </div>
+
+                <div class="demo-note">
+                    <strong>⚠️ 演示版本说明：</strong> 这是前端演示版本，使用模拟数据展示功能界面。生产环境建议接入专业的图像识别API（如百度AI、腾讯云、阿里云视觉智能等）以获得真实的AI分析结果。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const loading = document.getElementById('loading');
+        const resultSection = document.getElementById('resultSection');
+        const previewImg = document.getElementById('previewImg');
+        const resetBtn = document.getElementById('resetBtn');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('请选择图片文件！');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                alert('文件大小不能超过 10MB！');
+                return;
+            }
+
+            loading.classList.add('active');
+            resultSection.classList.remove('active');
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    analyzeImage(file, img, e.target.result);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function analyzeImage(file, img, dataUrl) {
+            // 显示图片
+            previewImg.src = dataUrl;
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('dimensions').textContent = `${img.width} × ${img.height}`;
+            document.getElementById('fileSize').textContent = formatFileSize(file.size);
+            document.getElementById('fileType').textContent = file.type;
+
+            // 模拟AI识别（实际应调用API）
+            setTimeout(() => {
+                // 根据图片特征生成模拟结果
+                const mockResults = generateMockResults(img);
+
+                // 显示标签
+                const tagList = document.getElementById('tagList');
+                tagList.innerHTML = '';
+                mockResults.tags.forEach(tag => {
+                    const tagEl = document.createElement('span');
+                    tagEl.className = 'tag';
+                    tagEl.textContent = tag;
+                    tagList.appendChild(tagEl);
+                });
+
+                // 显示置信度
+                const confidenceList = document.getElementById('confidenceList');
+                confidenceList.innerHTML = '';
+                mockResults.confidence.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'confidence-item';
+                    div.innerHTML = `
+                        <div class="confidence-label">
+                            <span class="label-name">${item.label}</span>
+                            <span class="label-value">${item.value}%</span>
+                        </div>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: ${item.value}%"></div>
+                        </div>
+                    `;
+                    confidenceList.appendChild(div);
+                });
+
+                // 显示描述
+                document.getElementById('description').textContent = mockResults.description;
+
+                loading.classList.remove('active');
+                resultSection.classList.add('active');
+            }, 2000);
+        }
+
+        function generateMockResults(img) {
+            // 根据图片尺寸和比例生成模拟识别结果
+            const ratio = img.width / img.height;
+            const isPortrait = ratio < 1;
+            const isSquare = Math.abs(ratio - 1) < 0.1;
+
+            let tags, confidence, description;
+
+            if (isPortrait) {
+                tags = ['人像', '肖像摄影', '专业摄影', '室内', '正面'];
+                confidence = [
+                    { label: '人像照片', value: 95 },
+                    { label: '专业摄影', value: 88 },
+                    { label: '室内场景', value: 76 }
+                ];
+                description = '这是一张人像照片，采用竖屏构图。画面主体清晰，光线柔和，适合用于社交媒体、简历或专业展示。';
+            } else if (isSquare) {
+                tags = ['社交媒体', '方形构图', '产品展示', '精美设计'];
+                confidence = [
+                    { label: '社交媒体图片', value: 92 },
+                    { label: '产品照片', value: 85 },
+                    { label: '设计作品', value: 78 }
+                ];
+                description = '这是一张方形构图的图片，非常适合在Instagram、微信朋友圈等社交平台分享。画面构图均衡，视觉效果良好。';
+            } else {
+                tags = ['风景', '横屏', '自然', '户外', '广角'];
+                confidence = [
+                    { label: '风景照片', value: 93 },
+                    { label: '户外场景', value: 87 },
+                    { label: '自然风光', value: 82 }
+                ];
+                description = '这是一张横屏构图的风景照片，视野开阔，层次分明。适合用于桌面壁纸、网站横幅或相册收藏。';
+            }
+
+            return { tags, confidence, description };
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+
+        resetBtn.addEventListener('click', () => {
+            fileInput.value = '';
+            resultSection.classList.remove('active');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 生图 | AI Image Generation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateX(-5px);
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.95;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Prompt Input */
+        .prompt-section {
+            margin-bottom: 25px;
+        }
+
+        .label {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #fa709a;
+            box-shadow: 0 0 0 3px rgba(250, 112, 154, 0.1);
+        }
+
+        /* Style Selection */
+        .style-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .style-option {
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .style-option:hover {
+            border-color: #fa709a;
+            transform: translateY(-2px);
+        }
+
+        .style-option.active {
+            border-color: #fa709a;
+            background: linear-gradient(135deg, rgba(250, 112, 154, 0.1), rgba(254, 225, 64, 0.1));
+        }
+
+        .style-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .style-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        /* Settings */
+        .settings-group {
+            margin-bottom: 25px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #fa709a;
+        }
+
+        /* Generate Button */
+        .generate-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #fa709a, #fee140);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(250, 112, 154, 0.4);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(250, 112, 154, 0.5);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Result Panel */
+        .result-panel {
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .placeholder {
+            text-align: center;
+            color: #cbd5e0;
+        }
+
+        .placeholder-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .placeholder-text {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #f3f4f6;
+            border-top: 5px solid #fa709a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 25px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 18px;
+            color: #4a5568;
+            font-weight: 600;
+        }
+
+        .result-image-container {
+            display: none;
+        }
+
+        .result-image-container.active {
+            display: block;
+        }
+
+        .result-image {
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            margin-bottom: 20px;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #fa709a, #fee140);
+            color: white;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(250, 112, 154, 0.4);
+        }
+
+        .btn-regenerate {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-regenerate:hover {
+            background: #cbd5e0;
+        }
+
+        /* Examples */
+        .examples {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 12px;
+        }
+
+        .examples-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #4a5568;
+            margin-bottom: 12px;
+        }
+
+        .example-item {
+            padding: 10px 12px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #4a5568;
+            transition: all 0.2s ease;
+        }
+
+        .example-item:hover {
+            background: #e2e8f0;
+            color: #1a202c;
+        }
+
+        .demo-note {
+            margin-top: 25px;
+            padding: 15px;
+            background: #fef3c7;
+            border-left: 5px solid #f59e0b;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #92400e;
+        }
+
+        @media (max-width: 968px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .card {
+                padding: 25px;
+            }
+
+            .back-btn {
+                position: static;
+                display: inline-block;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="image-tools-hub.html" class="back-btn">← 返回首页</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI 生图</h1>
+            <p>用文字描述创造独特的艺术作品</p>
+        </div>
+
+        <div class="main-grid">
+            <!-- Control Panel -->
+            <div class="card">
+                <div class="section-title">
+                    <span>✨</span>
+                    <span>创作设置</span>
+                </div>
+
+                <!-- Prompt Input -->
+                <div class="prompt-section">
+                    <label class="label">描述你想要的图片</label>
+                    <textarea id="promptInput" placeholder="例如：一只可爱的橘猫坐在窗台上，窗外是夕阳和城市天际线，温暖的光线，写实风格"></textarea>
+                </div>
+
+                <!-- Style Selection -->
+                <div class="prompt-section">
+                    <label class="label">艺术风格</label>
+                    <div class="style-grid">
+                        <div class="style-option active" data-style="realistic">
+                            <div class="style-icon">📸</div>
+                            <div class="style-name">写实</div>
+                        </div>
+                        <div class="style-option" data-style="anime">
+                            <div class="style-icon">🎨</div>
+                            <div class="style-name">动漫</div>
+                        </div>
+                        <div class="style-option" data-style="oil">
+                            <div class="style-icon">🖼️</div>
+                            <div class="style-name">油画</div>
+                        </div>
+                        <div class="style-option" data-style="abstract">
+                            <div class="style-icon">🌈</div>
+                            <div class="style-name">抽象</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Size Selection -->
+                <div class="settings-group">
+                    <label class="label">图片尺寸</label>
+                    <select id="sizeSelect">
+                        <option value="512x512">正方形 (512 × 512)</option>
+                        <option value="512x768">竖屏 (512 × 768)</option>
+                        <option value="768x512">横屏 (768 × 512)</option>
+                        <option value="1024x1024">高清 (1024 × 1024)</option>
+                    </select>
+                </div>
+
+                <!-- Quality Selection -->
+                <div class="settings-group">
+                    <label class="label">图片质量</label>
+                    <select id="qualitySelect">
+                        <option value="standard">标准</option>
+                        <option value="high">高质量</option>
+                        <option value="ultra">超高清</option>
+                    </select>
+                </div>
+
+                <!-- Generate Button -->
+                <button class="generate-btn" id="generateBtn">🎨 开始生成</button>
+
+                <!-- Examples -->
+                <div class="examples">
+                    <div class="examples-title">💡 创意示例（点击使用）</div>
+                    <div class="example-item" data-prompt="一只可爱的橘猫坐在窗台上，窗外是夕阳和城市天际线，温暖的光线">
+                        🐱 可爱橘猫与夕阳
+                    </div>
+                    <div class="example-item" data-prompt="未来科幻城市，飞行汽车在高楼之间穿梭，霓虹灯光，赛博朋克风格">
+                        🌃 赛博朋克城市
+                    </div>
+                    <div class="example-item" data-prompt="神秘的森林深处，古老的精灵树屋，发光的蘑菇，魔法般的氛围">
+                        🌲 魔法森林
+                    </div>
+                    <div class="example-item" data-prompt="宁静的日本庭院，樱花飘落，锦鲤在池塘游动，传统建筑">
+                        🏯 日式庭院
+                    </div>
+                </div>
+
+                <div class="demo-note">
+                    <strong>⚠️ 演示版本说明：</strong> 这是前端演示界面。生产环境需要接入AI生图API（如Stable Diffusion、Midjourney API、DALL-E、文心一格等）才能真正生成图片。
+                </div>
+            </div>
+
+            <!-- Result Panel -->
+            <div class="card">
+                <div class="section-title">
+                    <span>🖼️</span>
+                    <span>生成结果</span>
+                </div>
+
+                <div class="result-panel">
+                    <!-- Placeholder -->
+                    <div class="placeholder" id="placeholder">
+                        <div class="placeholder-icon">🎨</div>
+                        <div class="placeholder-text">输入描述，开始创作</div>
+                    </div>
+
+                    <!-- Loading -->
+                    <div class="loading" id="loading">
+                        <div class="spinner"></div>
+                        <div class="loading-text">AI 正在创作中...</div>
+                        <div style="font-size: 14px; color: #718096; margin-top: 10px;">
+                            这可能需要 10-30 秒
+                        </div>
+                    </div>
+
+                    <!-- Result -->
+                    <div class="result-image-container" id="resultContainer">
+                        <img class="result-image" id="resultImage" src="" alt="Generated Image">
+                        <div class="result-actions">
+                            <button class="btn btn-download" id="downloadBtn">
+                                💾 下载图片
+                            </button>
+                            <button class="btn btn-regenerate" id="regenerateBtn">
+                                🔄 重新生成
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const promptInput = document.getElementById('promptInput');
+        const styleOptions = document.querySelectorAll('.style-option');
+        const sizeSelect = document.getElementById('sizeSelect');
+        const qualitySelect = document.getElementById('qualitySelect');
+        const generateBtn = document.getElementById('generateBtn');
+        const placeholder = document.getElementById('placeholder');
+        const loading = document.getElementById('loading');
+        const resultContainer = document.getElementById('resultContainer');
+        const resultImage = document.getElementById('resultImage');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const regenerateBtn = document.getElementById('regenerateBtn');
+        const exampleItems = document.querySelectorAll('.example-item');
+
+        let currentStyle = 'realistic';
+
+        // 风格选择
+        styleOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                styleOptions.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                currentStyle = option.dataset.style;
+            });
+        });
+
+        // 示例点击
+        exampleItems.forEach(item => {
+            item.addEventListener('click', () => {
+                promptInput.value = item.dataset.prompt;
+            });
+        });
+
+        // 生成图片
+        generateBtn.addEventListener('click', () => {
+            const prompt = promptInput.value.trim();
+            if (!prompt) {
+                alert('请输入图片描述！');
+                return;
+            }
+
+            generateImage(prompt);
+        });
+
+        function generateImage(prompt) {
+            // 隐藏placeholder和结果
+            placeholder.style.display = 'none';
+            resultContainer.classList.remove('active');
+
+            // 显示loading
+            loading.classList.add('active');
+            generateBtn.disabled = true;
+
+            // 模拟AI生成（实际应调用API）
+            setTimeout(() => {
+                // 生成随机渐变色作为演示
+                const gradients = [
+                    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                    'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                    'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                    'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                    'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+                    'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+                    'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)'
+                ];
+
+                const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
+
+                // 创建canvas生成演示图片
+                const canvas = document.createElement('canvas');
+                const [width, height] = sizeSelect.value.split('x').map(Number);
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+
+                // 绘制渐变背景
+                const gradient = ctx.createLinearGradient(0, 0, width, height);
+                gradient.addColorStop(0, '#667eea');
+                gradient.addColorStop(1, '#764ba2');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, width, height);
+
+                // 添加文字
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.font = 'bold 36px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                // 文字换行
+                const words = prompt.split('');
+                const maxWidth = width - 80;
+                let line = '';
+                let y = height / 2 - 40;
+
+                ctx.font = 'bold 24px Arial';
+                const maxCharsPerLine = 20;
+                for (let i = 0; i < prompt.length; i += maxCharsPerLine) {
+                    const chunk = prompt.substring(i, i + maxCharsPerLine);
+                    ctx.fillText(chunk, width / 2, y);
+                    y += 35;
+                }
+
+                ctx.font = '18px Arial';
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                ctx.fillText(`风格: ${getStyleName(currentStyle)} | ${sizeSelect.value}`, width / 2, height - 40);
+
+                // 转换为图片
+                resultImage.src = canvas.toDataURL('image/png');
+
+                // 显示结果
+                loading.classList.remove('active');
+                resultContainer.classList.add('active');
+                generateBtn.disabled = false;
+            }, 3000);
+        }
+
+        function getStyleName(style) {
+            const names = {
+                realistic: '写实',
+                anime: '动漫',
+                oil: '油画',
+                abstract: '抽象'
+            };
+            return names[style] || style;
+        }
+
+        // 下载
+        downloadBtn.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = `ai-generated-${Date.now()}.png`;
+            link.href = resultImage.src;
+            link.click();
+        });
+
+        // 重新生成
+        regenerateBtn.addEventListener('click', () => {
+            const prompt = promptInput.value.trim();
+            if (prompt) {
+                generateImage(prompt);
+            }
+        });
+    </script>
+</body>
+</html>
